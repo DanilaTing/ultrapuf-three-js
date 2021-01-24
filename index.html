@@ -1,0 +1,121 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script type="module">
+			import { OrbitControls } from '/js/OrbitControls.js';
+			import { GLTFLoader } from './js/GLTFLoader.js';
+
+			// CAMERAS
+
+			const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+			camera.position.set( 0, 0, 1000 );
+
+			// SCENE
+
+			const scene = new THREE.Scene();
+			const sceneTexture = new THREE.TextureLoader().load( "textures/sky.jpg" );
+			scene.background = sceneTexture;
+
+			// Lights
+
+			const ambient = new THREE.AmbientLight( 0xffffff );
+			scene.add( ambient );
+
+			// Textures
+
+			const textureLoader = new THREE.TextureLoader();
+			const torusTexture = textureLoader.load( "textures/sky.jpg" );
+			torusTexture.mapping = THREE.EquirectangularReflectionMapping;
+			torusTexture.encoding = THREE.sRGBEncoding;
+
+			// Geometry
+
+			// const geometry = new THREE.IcosahedronBufferGeometry( 400, 15 );
+			// const sphereMaterial = new THREE.MeshLambertMaterial( { envMap: torusTexture } );
+			// const sphereMesh = new THREE.Mesh( geometry, sphereMaterial );
+			// scene.add( sphereMesh );
+
+			//
+
+			const torusGeometry = new THREE.TorusKnotGeometry( 200, 40, 100, 16 );
+			const torusMaterial = new THREE.MeshLambertMaterial( { envMap: torusTexture } );
+			const torusKnot = new THREE.Mesh( torusGeometry, torusMaterial );
+			// scene.add( torusKnot );
+
+			// loaders
+
+			const loader = new GLTFLoader();
+			loader.load(
+				'./models/ultrapuf.glb',
+				function ( gltf ) {
+					gltf.scene.traverse((o) => {
+					  o.material = torusMaterial;
+					});
+					gltf.scene.scale.set(700,700,700)
+					const box = new THREE.Box3().setFromObject( gltf.scene );
+					const center = box.getCenter( new THREE.Vector3() );
+
+					gltf.scene.position.x += ( gltf.scene.position.x - center.x );
+					gltf.scene.position.y += ( gltf.scene.position.y - center.y );
+					gltf.scene.position.z += ( gltf.scene.position.z - center.z );
+					scene.add( gltf.scene )
+
+					gltf.animations; // Array<THREE.AnimationClip>
+					gltf.scene; // THREE.Group
+					gltf.scenes; // Array<THREE.Group>
+					gltf.cameras; // Array<THREE.Camera>
+					gltf.asset; // Object
+
+				},
+				// called while loading is progressing
+				function ( xhr ) {
+					console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+				},
+				// called when loading has errors
+				function ( error ) {
+					console.log( 'An error happened' );
+				}
+			);
+
+			// Renderer
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.outputEncoding = THREE.sRGBEncoding;
+			document.body.appendChild( renderer.domElement );
+
+			//
+
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.minDistance = 500;
+			controls.maxDistance = 2500;
+
+			//
+
+			function animate() {
+				requestAnimationFrame( animate );
+				// torusKnot.rotation.x += 0.01;
+				// torusKnot.rotation.y += 0.01;
+
+				// sphereMesh.rotation.x += 0.01;
+				// sphereMesh.rotation.y += 0.01;
+				render();
+			}
+
+			function render() {
+				camera.lookAt( scene.position );
+				renderer.render( scene, camera );
+			}
+
+			animate()
+		</script>
+	</body>
+</html>
