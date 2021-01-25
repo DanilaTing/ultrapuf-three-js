@@ -11,6 +11,7 @@
 		<script type="module">
 			import { OrbitControls } from './js/OrbitControls.js';
 			import { GLTFLoader } from './js/GLTFLoader.js';
+			import { RGBELoader } from './js/RGBELoader.js';
 
 			// CAMERAS
 
@@ -20,10 +21,18 @@
 			// SCENE
 
 			const scene = new THREE.Scene();
-			const sceneTexture = new THREE.TextureLoader().load( "textures/sky.jpg" );
+			const sceneTexture = new THREE.TextureLoader().load( "textures/loc00184-22-8k.jpg" );
 			sceneTexture.mapping = THREE.EquirectangularReflectionMapping;
 			sceneTexture.encoding = THREE.sRGBEncoding;
 			scene.background = sceneTexture;
+
+			// const hdrLoader = new RGBELoader().load( 'textures/488-hdri-skies-com_01.hdr', function( texture ) {
+			// 	texture.encoding = THREE.RGBEEncoding;
+			// 	texture.flipY = true;
+			// 	texture.mapping = THREE.EquirectangularReflectionMapping;
+			//
+			// 	scene.background = texture;
+			// });
 
 			// Lights
 
@@ -50,7 +59,15 @@
 			//
 
 			const torusGeometry = new THREE.TorusKnotGeometry( 200, 40, 100, 16 );
-			const torusMaterial = new THREE.MeshLambertMaterial( { envMap: scene.background, reflectivity: 0.8, color: 'pink' } );
+			const torusMaterial = new THREE.MeshLambertMaterial( { reflectivity: 1, color: 'pink' } );
+			torusMaterial.envMap = scene.background;
+			// const hdrPlayaTextureLoader = new RGBELoader().load( 'textures/488-hdri-skies-com_01.hdr', function( texture ) {
+			// 	texture.encoding = THREE.RGBEEncoding;
+			// 	texture.flipY = true;
+			// 	texture.mapping = THREE.EquirectangularReflectionMapping;
+			// 	torusMaterial.envMap = texture;
+			//
+			// });
 			const torusKnot = new THREE.Mesh( torusGeometry, torusMaterial );
 			// scene.add( torusKnot );
 
