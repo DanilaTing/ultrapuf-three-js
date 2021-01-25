@@ -12,6 +12,7 @@
 			import { OrbitControls } from './js/OrbitControls.js';
 			import { GLTFLoader } from './js/GLTFLoader.js';
 			import { RGBELoader } from './js/RGBELoader.js';
+			import { DeviceOrientationControls } from './js/DeviceOrientationControls.js';
 
 			// CAMERAS
 
@@ -121,6 +122,8 @@
 			controls.minDistance = 500;
 			controls.maxDistance = 2500;
 
+			const controlsMobile = new DeviceOrientationControls( camera );
+
 			//
 
 			// function onDocumentMouseMove( event ) {
@@ -167,6 +170,7 @@
 				// torusKnot.rotation.y += 0.01;
 				// sphereMesh.rotation.x += 0.01;
 				// sphereMesh.rotation.y += 0.01;
+				controlsMobile.update();
 				render();
 			}
 
