@@ -9,7 +9,7 @@
 	<body>
 		<script src="js/three.js"></script>
 		<script type="module">
-			import { OrbitControls } from '/js/OrbitControls.js';
+			import { OrbitControls } from './js/OrbitControls.js';
 			import { GLTFLoader } from './js/GLTFLoader.js';
 
 			// CAMERAS
@@ -21,12 +21,17 @@
 
 			const scene = new THREE.Scene();
 			const sceneTexture = new THREE.TextureLoader().load( "textures/sky.jpg" );
+			sceneTexture.mapping = THREE.EquirectangularReflectionMapping;
+			sceneTexture.encoding = THREE.sRGBEncoding;
 			scene.background = sceneTexture;
 
 			// Lights
 
 			const ambient = new THREE.AmbientLight( 0xffffff );
 			scene.add( ambient );
+
+			const directionalLight = new THREE.DirectionalLight( 'pink', 10 );
+			scene.add( directionalLight );
 
 			// Textures
 
@@ -45,7 +50,7 @@
 			//
 
 			const torusGeometry = new THREE.TorusKnotGeometry( 200, 40, 100, 16 );
-			const torusMaterial = new THREE.MeshLambertMaterial( { envMap: torusTexture } );
+			const torusMaterial = new THREE.MeshLambertMaterial( { envMap: scene.background, reflectivity: 0.8, color: 'pink' } );
 			const torusKnot = new THREE.Mesh( torusGeometry, torusMaterial );
 			// scene.add( torusKnot );
 
@@ -90,6 +95,7 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.outputEncoding = THREE.sRGBEncoding;
+			renderer.physicallyCorrectLights = true
 			document.body.appendChild( renderer.domElement );
 
 			//
@@ -100,11 +106,48 @@
 
 			//
 
+			// function onDocumentMouseMove( event ) {
+		  //   event.preventDefault();
+			//
+		  //   if ( isMouseDown ) {
+			//
+		  //       theta = - ( ( event.clientX - onMouseDownPosition.x ) * 0.5 )
+		  //               + onMouseDownTheta;
+		  //       phi = ( ( event.clientY - onMouseDownPosition.y ) * 0.5 )
+		  //             + onMouseDownPhi;
+			//
+		  //       phi = Math.min( 180, Math.max( 0, phi ) );
+			//
+		  //       camera.position.x = radious * Math.sin( theta * Math.PI / 360 )
+		  //                           * Math.cos( phi * Math.PI / 360 );
+		  //       camera.position.y = radious * Math.sin( phi * Math.PI / 360 );
+		  //       camera.position.z = radious * Math.cos( theta * Math.PI / 360 )
+		  //                           * Math.cos( phi * Math.PI / 360 );
+		  //       camera.updateMatrix();
+			//
+		  //   }
+			//
+		  //   mouse3D = projector.unprojectVector(
+		  //       new THREE.Vector3(
+		  //           ( event.clientX / renderer.domElement.width ) * 2 - 1,
+		  //           - ( event.clientY / renderer.domElement.height ) * 2 + 1,
+		  //           0.5
+		  //       ),
+		  //       camera
+		  //   );
+		  //   ray.direction = mouse3D.subSelf( camera.position ).normalize();
+			//
+		  //   interact();
+		  //   render();
+			//
+			// }
+
+			//
+
 			function animate() {
 				requestAnimationFrame( animate );
 				// torusKnot.rotation.x += 0.01;
 				// torusKnot.rotation.y += 0.01;
-
 				// sphereMesh.rotation.x += 0.01;
 				// sphereMesh.rotation.y += 0.01;
 				render();
